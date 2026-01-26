@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Premium Black & Gold Chat UI Design System */
+
+@layer base {
+  :root {
+    /* Core backgrounds - ultra dark */
+    --background: 0 0% 2%;
+    --background-elevated: 0 0% 4%;
+    --background-panel: 0 0% 6%;
+    --background-hover: 0 0% 8%;
+    
+    /* Foreground - warm grays */
+    --foreground: 0 0% 96%;
+    --foreground-muted: 240 4% 65%;
+    --foreground-subtle: 240 4% 45%;
+    
+    /* Gold accent palette */
+    --gold: 43 76% 46%;
+    --gold-light: 43 90% 62%;
+    --gold-dark: 43 70% 35%;
+    --gold-glow: 43 100% 50%;
+    
+    /* Semantic tokens */
+    --primary: 43 76% 46%;
+    --primary-foreground: 0 0% 2%;
+    
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 96%;
+    
+    --muted: 0 0% 10%;
+    --muted-foreground: 240 4% 55%;
+    
+    --accent: 43 76% 46%;
+    --accent-foreground: 0 0% 2%;
+    
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 96%;
+    
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 96%;
+    
+    --border: 0 0% 12%;
+    --border-subtle: 0 0% 8%;
+    --input: 0 0% 10%;
+    --ring: 43 76% 46%;
+    
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --radius: 0.75rem;
+    
+    /* Glass effects */
+    --glass-bg: 0 0% 8% / 0.6;
+    --glass-border: 0 0% 100% / 0.05;
+    
+    /* Shadows and glows */
+    --shadow-gold: 0 4px 30px hsl(43 76% 46% / 0.15);
+    --shadow-subtle: 0 4px 20px hsl(0 0% 0% / 0.5);
+    --glow-gold: 0 0 40px hsl(43 76% 46% / 0.3);
+    
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(43 76% 46%), hsl(43 90% 62%));
+    --gradient-gold-subtle: linear-gradient(135deg, hsl(43 76% 46% / 0.1), hsl(43 90% 62% / 0.05));
+    --gradient-mesh: radial-gradient(ellipse at 20% 30%, hsl(43 76% 46% / 0.15) 0%, transparent 50%),
+                     radial-gradient(ellipse at 80% 70%, hsl(43 70% 35% / 0.1) 0%, transparent 50%),
+                     radial-gradient(ellipse at 50% 50%, hsl(0 0% 5%) 0%, hsl(0 0% 2%) 100%);
+    
+    /* Sidebar tokens */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 240 4% 65%;
+    --sidebar-primary: 43 76% 46%;
+    --sidebar-primary-foreground: 0 0% 2%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 0 0% 10%;
+    --sidebar-ring: 43 76% 46%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    @apply tracking-tight;
+  }
+}
+/* Thin gray scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #343434; /* gray-400 */
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280; /* gray-500 */
+}
+
+
+@layer components {
+  /* Glass panel effect */
+  .glass-panel {
+    @apply bg-[hsl(var(--glass-bg))] backdrop-blur-xl;
+    border: 1px solid hsl(var(--glass-border));
+  }
+  
+  /* Gold glow effect */
+  .gold-glow {
+    box-shadow: var(--glow-gold);
+  }
+  
+  /* Gold gradient text */
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Animated gold border */
+  .gold-border-animated {
+    position: relative;
+  }
+  
+  .gold-border-animated::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: var(--gradient-gold);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .gold-border-animated:hover::before,
+  .gold-border-animated:focus-within::before {
+    opacity: 1;
+  }
+  
+  /* Online indicator pulse */
+  .online-pulse {
+    @apply relative;
+  }
+  
+  .online-pulse::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-primary;
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-gold {
+    0%, 100% {
+      opacity: 0.4;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0;
+      transform: scale(1.8);
+    }
+  }
+  
+  /* Shimmer effect for buttons */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0 0% 100% / 0.1),
+      transparent
+    );
+    animation: shimmer 3s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+  
+  /* Input focus animation */
+  .input-gold {
+    @apply relative bg-transparent border-0 border-b border-border-subtle;
+    transition: all 0.3s ease;
+  }
+  
+  .input-gold::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-[1px] bg-primary;
+    transition: width 0.3s ease;
+  }
+  
+  .input-gold:focus {
+    @apply border-primary;
+  }
+  
+  /* Message bubble styles */
+  .bubble-sender {
+    background: linear-gradient(135deg, hsl(43 76% 46% / 0.15), hsl(43 70% 35% / 0.08));
+    border: 1px solid hsl(43 76% 46% / 0.2);
+  }
+  
+  .bubble-receiver {
+    @apply bg-[hsl(0_0%_8%/0.8)] backdrop-blur-sm;
+    border: 1px solid hsl(0 0% 100% / 0.03);
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.4s ease-out forwards;
+  }
+  
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out forwards;
+  }
+  
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Safe area utilities for mobile */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left, 0px);
+  }
+
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Touch-friendly tap highlight */
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom themed scrollbar */
+  .scrollbar-themed {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(43 76% 46% / 0.3) transparent;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-thumb {
+    background: hsl(43 76% 46% / 0.3);
+    border-radius: 3px;
+    transition: background 0.2s ease;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-thumb:hover {
+    background: hsl(43 76% 46% / 0.5);
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}

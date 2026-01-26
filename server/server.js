@@ -1,0 +1,82 @@
+import express from "express";
+import "dotenv/config";
+import cors from "cors";
+import http from "http"
+import { connectDB } from "./lib/db.js";
+import userRouter from "./routes/userRoutes.js";
+import messageRouter from "./routes/messageRoutes.js";
+import { Server } from "socket.io";
+import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
+
+
+const app=express();
+
+app.use(cors({
+  origin: "http://localhost:8080",
+  credentials: true,
+}));
+
+app.use("/api", ClerkExpressRequireAuth());
+// socket.io supports this http server only
+const server=http.createServer(app);
+
+//initialize socket.io server
+export const io = new Server(server,{
+    cors:{origin:"*"}
+})
+
+// 🔐 Clerk socket auth
+io.use((socket, next) => {
+  const clerkUserId = socket.handshake.auth.clerkUserId;
+  if (!clerkUserId) return next(new Error("Not authenticated"));
+
+  socket.userId = clerkUserId;
+  next();
+});
+
+// store online user
+export const userSocketMap={};  //{userId:socketId}
+
+// Socket.io connection handler
+io.on("connection", (socket) => {
+  const userId = socket.userId;
+  console.log("User Connected", userId);
+
+  if (userId) userSocketMap[userId] = socket.id;
+
+  // Emit online users to all connected clients
+  io.emit("getonlineusers", Object.keys(userSocketMap));
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", userId);
+    delete userSocketMap[userId];
+    io.emit("getonlineusers", Object.keys(userSocketMap));
+  });
+});
+
+
+//middlewere
+app.use(express.json({limit:"4mb"}));
+
+
+//routes 
+app.use("/api/status",(req,res)=>{
+res.send("server is live!")
+})
+app.use("/api/auth",userRouter);
+app.use("/api/messages",messageRouter);
+
+
+//connect to database
+await connectDB();
+
+const PORT = process.env.PORT || 7001;
+
+server.listen(PORT, () => {
+  console.log("server running on PORT:", PORT);
+});
+
+
+//export server for vercel
+export default server;
+
