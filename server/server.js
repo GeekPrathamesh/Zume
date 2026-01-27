@@ -65,6 +65,9 @@ res.send("server is live!")
 })
 app.use("/api/auth",userRouter);
 app.use("/api/messages",messageRouter);
+app.all("/health", (req, res) => {
+  res.status(200).send("OK");
+});
 
 
 //connect to database
