@@ -86,7 +86,7 @@ export function ChatArea({ onBack, onToggleProfile, showBackButton }: ChatAreaPr
           <div className="flex flex-col items-start">
             <h2 className="text-sm font-medium">{selectedUser.fullName}</h2>
             <p className="text-xs text-foreground-subtle">
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+              {onlineUsers.includes(selectedUser.clerkId) ? "Online" : "Offline"}
             </p>
           </div>
         </button>

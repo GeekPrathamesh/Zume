@@ -195,7 +195,7 @@ const navigate=useNavigate()
         id={user._id}
         name={user.fullName}
         profilePic={user.profilePic}
-        online={onlineUsers.includes(user._id)}
+        online={onlineUsers.includes(user.clerkId)}
         unread={unseenMessages?.[user._id] || 0}
         isActive={activeId === user._id}
         onClick={() => {

@@ -169,6 +169,22 @@ if (isMobile) {
      
               onToggleProfile={() => setShowProfile(!showProfile)}
             />
+               <AnimatePresence>
+      {showProfile && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", stiffness: 400, damping: 35 }}
+          className="absolute inset-y-0 right-0 w-[320px] border-l bg-background z-20"
+        >
+          <ProfilePanel
+            user={selectedUser}
+            onClose={() => setShowProfile(false)}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
 
             <motion.button
               whileHover={{ scale: 1.05 }}

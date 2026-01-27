@@ -12,6 +12,7 @@ import { useAuth } from "./useAuth";
 // Types
 type User = {
   _id: string;
+    clerkId: string;
   fullName: string;
   profilePic?: string;
 };
