@@ -11,10 +11,8 @@ import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
 const app=express();
 
-app.use(cors({
-  origin: "http://localhost:8080",
-  credentials: true,
-}));
+app.use(cors());
+
 
 app.use("/api", ClerkExpressRequireAuth());
 // socket.io supports this http server only
