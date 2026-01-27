@@ -47,7 +47,7 @@ export function ChatLayout({ onEditProfile, onLogout }: ChatLayoutProps) {
    // ================= MOBILE =================
 if (isMobile) {
   return (
-    <div className="h-screen w-full flex flex-col bg-background overflow-hidden">
+    <div className="h-[100dvh] w-full flex flex-col bg-background overflow-hidden">
 
       {/* Top Bar */}
       <div className="h-14 px-4 flex items-center justify-between border-b bg-background/90 backdrop-blur-md sticky top-0 z-30">
@@ -133,7 +133,7 @@ if (isMobile) {
 
   // ================= DESKTOP =================
  return (
-  <div className="h-screen w-full flex flex-col bg-background">
+  <div className="h-[100dvh] w-full flex flex-col bg-background">
 
     {/* Top Header */}
     <div className="h-14 px-4 flex items-center justify-between border-b bg-background/80 backdrop-blur-md">

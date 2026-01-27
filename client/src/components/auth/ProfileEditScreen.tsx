@@ -81,7 +81,7 @@ const handleDrop = (e: React.DragEvent) => {
 
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-background safe-area-top safe-area-bottom overflow-y-auto">
+    <div className="min-h-[100dvh] w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-background safe-area-top safe-area-bottom overflow-y-auto">
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div

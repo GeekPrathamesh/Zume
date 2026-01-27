@@ -9,7 +9,12 @@ interface MessageBubbleProps {
   seen: boolean;
 }
 
-export function MessageBubble({ content, image, isSender, seen }: MessageBubbleProps) {
+export function MessageBubble({
+  content,
+  image,
+  isSender,
+  seen,
+}: MessageBubbleProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96, y: 10 }}
@@ -20,16 +25,20 @@ export function MessageBubble({ content, image, isSender, seen }: MessageBubbleP
       <div
         className={cn(
           "max-w-[85%] sm:max-w-[70%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 space-y-2",
-          isSender ? "bubble-sender rounded-br-md" : "bubble-receiver rounded-bl-md"
+          isSender
+            ? "bubble-sender rounded-br-md"
+            : "bubble-receiver rounded-bl-md",
         )}
       >
         {/* Image */}
         {image && (
-          <img
-            src={image}
-            alt="sent"
-            className="max-w-[250px] rounded-lg mb-2"
-          />
+          <a href={image} target="_blank" rel="noopener noreferrer">
+            <img
+              src={image}
+              alt="sent"
+              className="max-w-[250px] rounded-lg mb-2 cursor-pointer hover:opacity-90 transition"
+            />
+          </a>
         )}
 
         {/* Text */}
@@ -37,7 +46,7 @@ export function MessageBubble({ content, image, isSender, seen }: MessageBubbleP
           <p
             className={cn(
               "text-sm leading-relaxed",
-              isSender ? "text-foreground" : "text-foreground-muted"
+              isSender ? "text-foreground" : "text-foreground-muted",
             )}
           >
             {content}

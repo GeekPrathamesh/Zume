@@ -19,7 +19,7 @@ const App = () => {
   const { authUser } = useAuth();
   if (!isLoaded || (isSignedIn && !authUser)) {
     return (
-<div className="h-screen flex flex-col items-center justify-center bg-background">
+<div className="h-[100dvh] flex flex-col items-center justify-center bg-background">
   <div className="w-12 h-12 rounded-full border-4 border-yellow-400/30 border-t-yellow-400 animate-spin" />
   <p className="mt-4 text-sm text-foreground-muted tracking-wide">
     Loading your workspace…
