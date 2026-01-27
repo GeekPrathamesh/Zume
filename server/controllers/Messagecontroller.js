@@ -108,10 +108,10 @@ const userId = mongoUser._id;
     });
 
     //emit new message to receiver socket
-    const receiverSocketId= userSocketMap[receiverId];
-    if (receiverSocketId) {
-  io.to(receiverSocketId).emit("newMessage", newMessage);
-}
+const receiver = await User.findById(receiverId);
+
+io.to(receiver.clerkId).emit("newMessage", newMessage);
+
 
 
     

@@ -40,7 +40,7 @@ const navigate = useNavigate()
 
   // 🔌 Socket connect using Clerk ID
   const connectSocket = () => {
-    if (socket?.connected || !clerkUser) return;
+    if (!clerkUser) return;
 
     const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
       auth: {

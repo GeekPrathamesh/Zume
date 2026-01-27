@@ -125,12 +125,14 @@ const { axios, socket ,getToken } = useAuth();
         }
       );
       } else {
-        setunseenMessages((prev) => ({
-          ...prev,
-          [newMessage.senderId]: prev?.[newMessage.senderId]
-            ? prev[newMessage.senderId] + 1
-            : 1,
-        }));
+        setunseenMessages((prev) => {
+  const safePrev = prev || {};
+  return {
+    ...safePrev,
+    [newMessage.senderId]: (safePrev[newMessage.senderId] || 0) + 1,
+  };
+});
+
       }
     });
   };
@@ -139,10 +141,35 @@ const { axios, socket ,getToken } = useAuth();
     if (socket) socket.off("newMessage");
   };
 
-  useEffect(() => {
-    subscribeToMessages();
-    return () => unsubscribeToMessages();
-  }, [socket, selectedUser]);
+useEffect(() => {
+  if (!socket) return;
+
+  const handler = async (newMessage: Message) => {
+    if (selectedUser && newMessage.senderId === selectedUser._id) {
+      const updated = { ...newMessage, seen: true };
+      setmessages(prev => [...prev, updated]);
+
+      const token = await getToken();
+      await axios.put(
+        `/api/messages/mark/${newMessage._id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } else {
+      setunseenMessages(prev => ({
+        ...(prev || {}),
+        [newMessage.senderId]: ((prev || {})[newMessage.senderId] || 0) + 1,
+      }));
+    }
+  };
+
+  socket.on("newMessage", handler);
+
+  return () => {
+    socket.off("newMessage", handler);
+  };
+}, [socket, selectedUser]);
+
 
   const value: MessageContextType = {
     messages,

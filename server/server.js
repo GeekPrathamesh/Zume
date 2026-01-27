@@ -40,20 +40,19 @@ export const userSocketMap={};  //{userId:socketId}
 
 // Socket.io connection handler
 io.on("connection", (socket) => {
-  const userId = socket.userId;
-  console.log("User Connected", userId);
+  const clerkId = socket.userId;
 
-  if (userId) userSocketMap[userId] = socket.id;
+  socket.join(clerkId); // 🔥 personal room
 
-  // Emit online users to all connected clients
+  userSocketMap[clerkId] = socket.id;
   io.emit("getonlineusers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
-    console.log("User Disconnected", userId);
-    delete userSocketMap[userId];
+    delete userSocketMap[clerkId];
     io.emit("getonlineusers", Object.keys(userSocketMap));
   });
 });
+
 
 
 //middlewere
