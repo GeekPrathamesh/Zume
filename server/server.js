@@ -11,7 +11,10 @@ import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
 
 const app=express();
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => callback(null, true),
+  credentials: true,
+}));
 
 
 app.use("/api", ClerkExpressRequireAuth());
