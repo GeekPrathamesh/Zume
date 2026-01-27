@@ -7,7 +7,7 @@
 /* Premium Black & Gold Chat UI Design System */
 html, body, #root {
   height: 100%;
-  overflow: hidden;
+
 }
 
 @layer base {
