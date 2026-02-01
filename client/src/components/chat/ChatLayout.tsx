@@ -51,7 +51,7 @@ if (isMobile) {
 
       {/* Top Bar */}
       <div className="h-14 px-4 flex items-center justify-between border-b bg-background/90 backdrop-blur-md sticky top-0 z-30">
-        <h1 className="text-lg font-semibold tracking-wide">Aura</h1>
+        <h1 className="text-lg font-semibold tracking-wide">Zuumm</h1>
 
         <UserButton
           afterSignOutUrl="/login"
@@ -137,7 +137,7 @@ if (isMobile) {
 
     {/* Top Header */}
     <div className="h-14 px-4 flex items-center justify-between border-b bg-background/80 backdrop-blur-md">
-      <h1 className="text-lg font-semibold tracking-wide">Aura</h1>
+      <h1 className="text-lg font-semibold tracking-wide">Zuumm</h1>
       <UserButton
         afterSignOutUrl="/login"
         appearance={{

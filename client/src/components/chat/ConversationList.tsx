@@ -106,7 +106,7 @@ const navigate=useNavigate()
 
 {/* Popup Header */}
 <div className="h-14 px-4 flex items-center justify-between border-b border-border-subtle bg-background/80 backdrop-blur-md">
-  <h1 className="text-sm font-semibold tracking-wide">Aura</h1>
+  <h1 className="text-sm font-semibold tracking-wide">Zuumm</h1>
 
   {/* Wrapper with ref */}
   <div  onClick={() => setShowSettingsMenu(false)}>

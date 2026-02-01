@@ -26,7 +26,7 @@ export const io = new Server(server,{
     cors:{origin:"*"}
 })
 
-// 🔐 Clerk socket auth
+//  Clerk socket auth
 io.use((socket, next) => {
   const clerkUserId = socket.handshake.auth.clerkUserId;
   if (!clerkUserId) return next(new Error("Not authenticated"));
