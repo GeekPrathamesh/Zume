@@ -1,6 +1,6 @@
 # ZUUM — Real-Time Chat Application
 
-Live Demo: https://zuum-cobi.vercel.app/
+Live Demo: https://zuum-iota.vercel.app
 
 Tech Stack: React, Node.js, Express, MongoDB, Socket.io, AWS EC2, NGINX
 
