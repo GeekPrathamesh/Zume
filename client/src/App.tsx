@@ -10,26 +10,23 @@ import { LoginScreen, SignupScreen } from "@/components/auth/LoginScreen";
 import { ProfileEditScreen } from "@/components/auth/ProfileEditScreen";
 import { ChatLayout } from "@/components/chat/ChatLayout";
 import NotFound from "./pages/NotFound";
-import { useUser } from "@clerk/clerk-react";
-
 const queryClient = new QueryClient();
 
 const App = () => {
-  const { isSignedIn, isLoaded } = useUser();
-  const { authUser } = useAuth();
-  if (!isLoaded || (isSignedIn && !authUser)) {
-    return (
-<div className="h-[100dvh] flex flex-col items-center justify-center bg-background">
-  <div className="w-12 h-12 rounded-full border-4 border-yellow-400/30 border-t-yellow-400 animate-spin" />
-  <p className="mt-4 text-sm text-foreground-muted tracking-wide">
-    Loading your workspace…
-  </p>
-</div>
+  const { authUser, isCheckingAuth } = useAuth();
 
+  if (isCheckingAuth) {
+    return (
+      <div className="h-[100dvh] flex flex-col items-center justify-center bg-background">
+        <div className="w-12 h-12 rounded-full border-4 border-yellow-400/30 border-t-yellow-400 animate-spin" />
+        <p className="mt-4 text-sm text-foreground-muted tracking-wide">
+          Loading your workspace…
+        </p>
+      </div>
     );
   }
 
-  const isAuthenticated = isSignedIn && authUser;
+  const isAuthenticated = !!authUser;
 
   return (
     <QueryClientProvider client={queryClient}>

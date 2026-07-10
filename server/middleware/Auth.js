@@ -4,13 +4,17 @@ import jwt from "jsonwebtoken";
 
 export const protectedRoute = async (req, res, next) => {
   try {
-    const token = req.headers.token;
+    let token = req.cookies?.token || req.headers.token || req.headers.authorization;
 
     if (!token) {
       return res.status(401).json({
         success: false,
         message: "No token provided",
       });
+    }
+
+    if (typeof token === "string" && token.startsWith("Bearer ")) {
+      token = token.slice(7);
     }
 
     const decoded = jwt.verify(token, process.env.JWTSECRET_KEY);

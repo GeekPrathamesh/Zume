@@ -1,169 +1,159 @@
-// import { generateToken } from "../lib/utils.js";
 import User from "../models/Usermodel.js";
-// import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
-import clerkClient from "@clerk/clerk-sdk-node";
+import bcrypt from "bcryptjs";
+import { generateToken } from "../lib/utils.js";
 
-//sign up new user
+// Helper to set cookie
+const setTokenCookie = (res, token) => {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+};
 
-
-// Sync Clerk user to MongoDB
-export const clerkSync = async (req, res) => {
+// SIGN UP
+export const Signup = async (req, res) => {
   try {
-    const clerkId = req.auth.userId;
+    const { email, fullName, password, bio } = req.body;
 
-    const clerkUser = await clerkClient.users.getUser(clerkId);
-
-    const email = clerkUser.emailAddresses[0].emailAddress;
-    const fullName = clerkUser.firstName || "User";
-
-    let user = await User.findOne({ clerkId });
-
-    if (!user) {
-      user = await User.create({
-        clerkId,
-        email,
-        fullName,
-        bio: "",
+    if (!email || !fullName || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing details",
       });
     }
 
-    res.json({ success: true, user });
-  } catch (err) {
-    console.error("Clerk Sync Error:", err);
-    res.status(500).json({ success: false, message: err.message });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+      bio: bio || "",
+    });
+
+    const token = generateToken(newUser._id);
+    setTokenCookie(res, token);
+
+    res.status(201).json({
+      success: true,
+      user: {
+        _id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        bio: newUser.bio,
+        profilePic: newUser.profilePic || "",
+      },
+      message: "Account created successfully",
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
+// LOGIN
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-// Check auth (Clerk already verified)
-export const checkAuth = (req, res) => {
-  res.json({ success: true, userId: req.auth.userId });
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing email or password",
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = generateToken(user._id);
+    setTokenCookie(res, token);
+
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        bio: user.bio,
+        profilePic: user.profilePic || "",
+      },
+      message: "Login successful",
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
+// LOGOUT
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
+  res.json({ success: true, message: "Logged out successfully" });
+};
 
-// // SIGN UP
-// export const Signup = async (req, res) => {
-//   try {
-//     const { email, fullName, password, bio } = req.body;
-
-//     if (!email || !fullName || !password || !bio) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Missing details",
-//       });
-//     }
-
-//     const existingUser = await User.findOne({ email });
-//     if (existingUser) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "User already exists",
-//       });
-//     }
-
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, salt);
-
-//     const newUser = await User.create({
-//       fullName,
-//       email,
-//       password: hashedPassword,
-//       bio,
-//     });
-
-//     const token = generateToken(newUser._id);
-
-//     res.status(201).json({
-//       success: true,
-//       userData: {
-//         _id: newUser._id,
-//         fullName: newUser.fullName,
-//         email: newUser.email,
-//         bio: newUser.bio,
-//       },
-//       token,
-//       message: "Account created successfully",
-//     });
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
-
-// //login a user and return him token
-// // LOGIN
-// export const login = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     const userData = await User.findOne({ email });
-//     if (!userData) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Create account first",
-//       });
-//     }
-
-//     const isPasswordCorrect = await bcrypt.compare(password, userData.password);
-
-//     if (!isPasswordCorrect) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid credentials",
-//       });
-//     }
-
-//     const token = generateToken(userData._id);
-
-//     res.json({
-//       success: true,
-//       userData: {
-//         _id: userData._id,
-//         fullName: userData.fullName,
-//         email: userData.email,
-//         bio: userData.bio,
-//       },
-//       token,
-//       message: "Login successful",
-//     });
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
-
-// check if user authenticated
-
-
+// Check auth (User already verified by protectedRoute middleware)
+export const checkAuth = (req, res) => {
+  res.json({ success: true, user: req.user });
+};
 
 // Update profile
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic, bio, fullName } = req.body;
-    const clerkId = req.auth.userId;
+    const userId = req.user._id;
 
     let updatedUser;
 
     if (!profilePic) {
-      updatedUser = await User.findOneAndUpdate(
-        { clerkId },
+      updatedUser = await User.findByIdAndUpdate(
+        userId,
         { bio, fullName },
         { new: true }
-      );
+      ).select("-password");
     } else {
       const upload = await cloudinary.uploader.upload(profilePic);
-      updatedUser = await User.findOneAndUpdate(
-        { clerkId },
+      updatedUser = await User.findByIdAndUpdate(
+        userId,
         { profilePic: upload.secure_url, bio, fullName },
         { new: true }
-      );
+      ).select("-password");
     }
 
     res.json({ success: true, user: updatedUser });
@@ -171,36 +161,3 @@ export const updateProfile = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-
-// controller to update user profile details
-// export const updateProfile = async (req, res) => {
-//   try {
-//     const { profilePic, bio, fullName } = req.body;
-//     const userId = req.user._id;
-//     let updatedUser;
-//     if (!profilePic) {
-//       updatedUser = await User.findByIdAndUpdate(
-//         userId,
-//         { bio, fullName },
-//         { new: true }
-//       );
-//     } else {
-//       const upload = await cloudinary.uploader.upload(profilePic);
-//       updatedUser = await User.findByIdAndUpdate(
-//         userId,
-//         {
-//           profilePic: upload.secure_url,
-//           bio,
-//           fullName,
-//         },
-//         { new: true }
-//       );
-//     }
-//     res.json({success:true,user:updatedUser})
-//   } catch (error) {
-//     console.log(error.message);
-    
-//         res.json({success:false,message:error.message})
-
-//   }
-// };

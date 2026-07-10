@@ -1,10 +1,13 @@
 import express from "express";
-import { clerkSync, checkAuth, updateProfile } from "../controllers/Usercontroller.js";
+import { Signup, login, checkAuth, updateProfile, logout } from "../controllers/Usercontroller.js";
+import { protectedRoute } from "../middleware/Auth.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/clerk-sync", clerkSync);
-userRouter.get("/check", checkAuth);
-userRouter.put("/update-profile", updateProfile);
+userRouter.post("/signup", Signup);
+userRouter.post("/login", login);
+userRouter.post("/logout", logout);
+userRouter.get("/check", protectedRoute, checkAuth);
+userRouter.put("/update-profile", protectedRoute, updateProfile);
 
 export default userRouter;

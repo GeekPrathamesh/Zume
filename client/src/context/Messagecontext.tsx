@@ -1,6 +1,5 @@
 import {
   createContext,
-  useContext,
   useEffect,
   useState,
   ReactNode,
@@ -12,11 +11,9 @@ import { useAuth } from "./useAuth";
 // Types
 type User = {
   _id: string;
-    clerkId: string;
   fullName: string;
   profilePic?: string;
 };
-
 
 type Message = {
   _id: string;
@@ -27,8 +24,6 @@ type Message = {
   image?: string;
   createdAt?: string;
 };
-
-
 
 type MessageContextType = {
   messages: Message[];
@@ -43,7 +38,6 @@ type MessageContextType = {
   setunseenMessages: React.Dispatch<
     React.SetStateAction<Record<string, number> | null>
   >;
-  
 };
 
 export const Messagecontext = createContext<MessageContextType | null>(null);
@@ -54,15 +48,11 @@ export const MessageProvider = ({ children }: { children: ReactNode }) => {
   const [selectedUser, setselectedUser] = useState<User | null>(null);
   const [unseenMessages, setunseenMessages] = useState<Record<string, number> | null>(null);
 
-const { axios, socket ,getToken } = useAuth();
+  const { axios, socket } = useAuth();
 
   const getUsers = async () => {
     try {
-            const token = await getToken();
-      const { data } = await axios.get("/api/messages/users",{
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }});
+      const { data } = await axios.get("/api/messages/users");
       if (data.success) {
         setUsers(data.users);
         setunseenMessages(data.unseenMessages);
@@ -74,13 +64,7 @@ const { axios, socket ,getToken } = useAuth();
 
   const getMessegesforselected = async (userId: string) => {
     try {
-      const token = await getToken();
-          const { data } = await axios.get(`/api/messages/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+      const { data } = await axios.get(`/api/messages/${userId}`);
       if (data.success) {
         setmessages(data.messages);
       }
@@ -91,12 +75,9 @@ const { axios, socket ,getToken } = useAuth();
 
   const sendMessage = async (messageData: any) => {
     try {
-       const token = await getToken();
       const { data } = await axios.post(
         `/api/messages/send/${selectedUser?._id}`,
-        messageData,{
-  headers: { Authorization: `Bearer ${token}` }
-}
+        messageData
       );
       if (data.success) {
         setmessages((prev) => [...prev, data.newMessage]);
@@ -108,68 +89,28 @@ const { axios, socket ,getToken } = useAuth();
     }
   };
 
-  const subscribeToMessages = () => {
+  useEffect(() => {
     if (!socket) return;
 
-    socket.on("newMessage", async(newMessage: Message) => {
+    const handler = async (newMessage: Message) => {
       if (selectedUser && newMessage.senderId === selectedUser._id) {
-        newMessage.seen = true;
-        setmessages((prev) => [...prev, newMessage]);
-              const token = await getToken();
-
-          await axios.put(
-        `/api/messages/mark/${newMessage._id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        const updated = { ...newMessage, seen: true };
+        setmessages(prev => [...prev, updated]);
+        await axios.put(`/api/messages/mark/${newMessage._id}`, {});
       } else {
-        setunseenMessages((prev) => {
-  const safePrev = prev || {};
-  return {
-    ...safePrev,
-    [newMessage.senderId]: (safePrev[newMessage.senderId] || 0) + 1,
-  };
-});
-
+        setunseenMessages(prev => ({
+          ...(prev || {}),
+          [newMessage.senderId]: ((prev || {})[newMessage.senderId] || 0) + 1,
+        }));
       }
-    });
-  };
+    };
 
-  const unsubscribeToMessages = () => {
-    if (socket) socket.off("newMessage");
-  };
+    socket.on("newMessage", handler);
 
-useEffect(() => {
-  if (!socket) return;
-
-  const handler = async (newMessage: Message) => {
-    if (selectedUser && newMessage.senderId === selectedUser._id) {
-      const updated = { ...newMessage, seen: true };
-      setmessages(prev => [...prev, updated]);
-
-      const token = await getToken();
-      await axios.put(
-        `/api/messages/mark/${newMessage._id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-    } else {
-      setunseenMessages(prev => ({
-        ...(prev || {}),
-        [newMessage.senderId]: ((prev || {})[newMessage.senderId] || 0) + 1,
-      }));
-    }
-  };
-
-  socket.on("newMessage", handler);
-
-  return () => {
-    socket.off("newMessage", handler);
-  };
-}, [socket, selectedUser]);
-
+    return () => {
+      socket.off("newMessage", handler);
+    };
+  }, [socket, selectedUser]);
 
   const value: MessageContextType = {
     messages,
